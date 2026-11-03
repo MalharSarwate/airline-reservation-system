@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AeroLuxe - My Flight Reservations</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+  </style>
+</head>
+<body class="bg-[#090d16] text-slate-100 antialiased min-h-screen selection:bg-sky-500 selection:text-white">
+
+  <!-- Header Bar -->
+  <header class="sticky top-0 z-40 bg-[#0f172a]/95 backdrop-blur-md border-b border-slate-800 px-4 py-3 sm:px-8">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <a href="index.html" class="flex items-center gap-2.5 group">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 via-indigo-600 to-blue-500 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-sky-500/20 group-hover:scale-105 transition">
+          ✈
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base font-black tracking-wider text-white uppercase">AeroLuxe</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-400 font-bold uppercase tracking-wider border border-sky-500/30">Skyfleet 2.0</span>
+          </div>
+          <span class="text-[11px] text-slate-400 block tracking-widest font-mono">PASSENGER DASHBOARD</span>
+        </div>
+      </a>
+
+      <!-- User Session Actions -->
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+          <span class="text-slate-400">Traveler:</span>
+          <span class="font-bold text-sky-400 font-mono" id="navTravelerName">Malhar Sarwate</span>
+        </div>
+
+        <a href="index.html" class="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white text-xs font-black shadow-md hover:opacity-95 transition flex items-center gap-1.5">
+          <span>+ Book New Flight</span>
+        </a>
+
+        <a href="login.html?logout=true" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-rose-400 border border-slate-800 text-xs font-bold transition">
+          Sign Out
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto px-4 py-8 space-y-6">
+    
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-black text-white">My Confirmed Reservations</h1>
+        <p class="text-xs text-slate-400">View electronic tickets, gate assignments, and manage seat reservations.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl font-bold" id="tripCountBadge">
+          1 Trip On Record
+        </span>
+      </div>
+    </div>
+
+    <!-- Bookings Cards Container -->
+    <div id="bookingsList" class="space-y-4">
+      <!-- Populated via JavaScript -->
+    </div>
+
+  </main>
+
+  <script>
+    // Initialize user and bookings
+    function loadBookings() {
+      const user = JSON.parse(localStorage.getItem('aeroluxe_active_user') || '{"fullName":"Malhar Sarwate","email":"malhar@aeroluxe.com"}');
+      document.getElementById('navTravelerName').textContent = user.fullName;
+
+      let bookings = JSON.parse(localStorage.getItem('aeroluxe_bookings') || '[]');
+      
+      // If empty, provide the default confirmed trip
+      if (!bookings || bookings.length === 0) {
+        bookings = [{
+          id: 1097,
+          pnr: 'AL-948210',
+          flightCode: 'AL-1097',
+          airline: 'AeroLuxe Skyfleet',
+          aircraftModel: 'Boeing 787-9 Dreamliner',
+          originCode: 'JFK',
+          originCity: 'New York',
+          originTerminal: 'Terminal 4',
+          destCode: 'LHR',
+          destCity: 'London',
+          destTerminal: 'Terminal 5',
+          departureTime: '08:30 AM',
+          arrivalTime: '20:45 PM',
+          duration: '7h 15m non-stop',
+          seatCode: '17A',
+          passengerName: user.fullName,
+          gate: 'B14',
+          boardingTime: '07:50 AM',
+          totalPrice: '522.50',
+          status: 'CONFIRMED',
+          date: 'Nov 20, 2026'
+        }];
+        localStorage.setItem('aeroluxe_bookings', JSON.stringify(bookings));
+      }
+
+      document.getElementById('tripCountBadge').textContent = `${bookings.length} Trip${bookings.length > 1 ? 's' : ''} On Record`;
+
+      const container = document.getElementById('bookingsList');
+      if (bookings.length === 0) {
+        container.innerHTML = `
+          <div class="p-12 text-center bg-slate-900/60 border border-slate-800 rounded-3xl space-y-4">
+            <div class="w-16 h-16 rounded-3xl bg-sky-500/10 text-sky-400 border border-sky-500/20 flex items-center justify-center text-3xl mx-auto">✈</div>
+            <h3 class="text-lg font-black text-white">No Flights Reserved Yet</h3>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto">Your next journey awaits. Choose your seat and issue your boarding pass.</p>
+            <a href="index.html" class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-black text-xs shadow-lg shadow-sky-500/20 hover:opacity-95 transition">
+              <span>Reserve Flight Seats Now</span><span>→</span>
+            </a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = bookings.map(b => `
+        <div id="booking-card-${b.id}" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-5 transition">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white flex items-center justify-center font-black text-base shadow">AL</div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-base font-black text-white">${b.airline}</span>
+                  <span class="text-xs font-mono font-bold text-sky-400">${b.flightCode}</span>
+                </div>
+                <span class="text-xs text-slate-400">${b.aircraftModel}</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <span class="text-[10px] font-mono text-slate-500 uppercase block">PNR Record</span>
+                <span class="text-base font-mono font-black text-sky-400">${b.pnr}</span>
+              </div>
+              <span class="px-3 py-1 rounded-full ${b.status === 'CONFIRMED' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border-rose-500/30'} border text-xs font-bold font-mono">
+                ${b.status}
+              </span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center text-center sm:text-left">
+            <div>
+              <span class="text-3xl font-black text-white tracking-wider block">${b.originCode}</span>
+              <span class="text-xs text-slate-400">${b.originCity} • ${b.originTerminal}</span>
+              <span class="text-xs font-mono font-bold text-sky-400 block mt-1">${b.departureTime}</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <span class="text-xs font-mono text-slate-400 font-bold mb-1">${b.duration}</span>
+              <div class="w-full max-w-[180px] h-[2px] bg-slate-800 relative flex items-center justify-center">
+                <span class="text-sky-400 text-sm absolute">✈</span>
+              </div>
+              <span class="text-[10px] font-mono text-emerald-400 font-bold mt-1">Direct Flight</span>
+            </div>
+            <div class="sm:text-right">
+              <span class="text-3xl font-black text-white tracking-wider block">${b.destCode}</span>
+              <span class="text-xs text-slate-400">${b.destCity} • ${b.destTerminal}</span>
+              <span class="text-xs font-mono font-bold text-sky-400 block mt-1">${b.arrivalTime}</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 p-4 rounded-2xl bg-slate-950 border border-slate-800 text-center text-xs">
+            <div>
+              <span class="text-[10px] uppercase text-slate-500 font-mono block">Passenger</span>
+              <span class="font-black text-white block truncate">${b.passengerName}</span>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase text-slate-500 font-mono block">Seat Assigned</span>
+              <span class="font-black text-emerald-400 font-mono text-sm block">${b.seatCode}</span>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase text-slate-500 font-mono block">Gate</span>
+              <span class="font-black text-sky-400 text-sm block">${b.gate}</span>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase text-slate-500 font-mono block">Boarding Time</span>
+              <span class="font-black text-white block">${b.boardingTime}</span>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase text-slate-500 font-mono block">Total Fare</span>
+              <span class="font-black text-white font-mono text-sm block">$${b.totalPrice}</span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <div class="text-xs text-slate-500 font-mono">Booked for ${b.date}</div>
+            <div class="flex items-center gap-3">
+              <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold border border-slate-700 transition flex items-center gap-1.5">
+                <span>🖨 Print Ticket</span>
+              </button>
+              ${b.status === 'CONFIRMED' ? `
+                <button onclick="cancelBookingLocal(${b.id})" class="px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold border border-rose-500/30 transition">
+                  Cancel Booking ✕
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function cancelBookingLocal(id) {
+      if (!confirm('Are you sure you want to cancel this flight reservation? Your seat will be released.')) return;
+      let bookings = JSON.parse(localStorage.getItem('aeroluxe_bookings') || '[]');
+      bookings = bookings.map(b => b.id == id ? { ...b, status: 'CANCELLED' } : b);
+      localStorage.setItem('aeroluxe_bookings', JSON.stringify(bookings));
+      loadBookings();
+    }
+
+    window.addEventListener('DOMContentLoaded', loadBookings);
+  </script>
+
+</body>
+</html>
