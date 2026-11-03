@@ -1,0 +1,22 @@
+# Maven Build Output
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# IDE & Editor Files
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# OS Hidden Files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

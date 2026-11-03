@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AeroLuxe - My Flight Reservations</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+  </style>
+</head>
+<body class="bg-[#090d16] text-slate-100 antialiased min-h-screen selection:bg-sky-500 selection:text-white">
+
+  <!-- Header Bar -->
+  <header class="sticky top-0 z-40 bg-[#0f172a]/95 backdrop-blur-md border-b border-slate-800 px-4 py-3 sm:px-8">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <a th:href="@{/booking}" href="index.html" class="flex items-center gap-2.5 group">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 via-indigo-600 to-blue-500 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-sky-500/20 group-hover:scale-105 transition">
+          ✈
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base font-black tracking-wider text-white uppercase">AeroLuxe</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-400 font-bold uppercase tracking-wider border border-sky-500/30">Skyfleet 2.0</span>
+          </div>
+          <span class="text-[11px] text-slate-400 block tracking-widest font-mono">PASSENGER DASHBOARD</span>
+        </div>
+      </a>
+
+      <!-- User Session Actions -->
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+          <span class="text-slate-400">Traveler:</span>
+          <span class="font-bold text-sky-400 font-mono" th:text="${user != null ? user.fullName : 'Malhar Sarwate'}">Malhar Sarwate</span>
+        </div>
+
+        <a th:href="@{/booking}" href="index.html" class="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white text-xs font-black shadow-md hover:opacity-95 transition flex items-center gap-1.5">
+          <span>+ Book New Flight</span>
+        </a>
+
+        <form th:action="@{/logout}" action="login.html" method="post" class="inline">
+          <button type="submit" onclick="if(window.location.protocol==='file:'){window.location.href='login.html';return false;}" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-rose-400 border border-slate-800 text-xs font-bold transition">
+            Sign Out
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto px-4 py-8 space-y-6">
+    
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-black text-white">My Confirmed Reservations</h1>
+        <p class="text-xs text-slate-400">View electronic tickets, gate assignments, and manage seat reservations.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl font-bold">
+          <span th:text="${#lists.size(bookings)}">0</span> Trips On Record
+        </span>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${#lists.isEmpty(bookings)}" class="p-12 text-center bg-slate-900/60 border border-slate-800 rounded-3xl space-y-4">
+      <div class="w-16 h-16 rounded-3xl bg-sky-500/10 text-sky-400 border border-sky-500/20 flex items-center justify-center text-3xl mx-auto">
+        ✈
+      </div>
+      <h3 class="text-lg font-black text-white">No Flights Reserved Yet</h3>
+      <p class="text-xs text-slate-400 max-w-sm mx-auto">
+        Your next destination awaits. Search schedules, choose your contoured airplane seat, and issue your boarding pass.
+      </p>
+      <a th:href="@{/booking}" class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-black text-xs shadow-lg shadow-sky-500/20 hover:opacity-95 transition">
+        <span>Reserve Flight Seats Now</span>
+        <span>→</span>
+      </a>
+    </div>
+
+    <!-- Bookings Cards Grid -->
+    <div th:unless="${#lists.isEmpty(bookings)}" class="space-y-4">
+      <div th:each="b : ${bookings}" th:id="'booking-card-' + ${b.id}" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-5 transition">
+        
+        <!-- Header -->
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white flex items-center justify-center font-black text-base shadow">
+              AL
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-base font-black text-white" th:text="${b.flight.airline}">AeroLuxe Skyfleet</span>
+                <span class="text-xs font-mono font-bold text-sky-400" th:text="${b.flight.flightCode}">AL-1097</span>
+              </div>
+              <span class="text-xs text-slate-400" th:text="${b.flight.aircraftModel}">Boeing 787-9 Dreamliner</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <!-- PNR Record Locator -->
+            <div class="text-right">
+              <span class="text-[10px] font-mono text-slate-500 uppercase block">PNR Record</span>
+              <span class="text-base font-mono font-black text-sky-400" th:text="${b.pnr}">AL-948210</span>
+            </div>
+
+            <!-- Status Pill -->
+            <span th:if="${b.status == 'CONFIRMED'}" class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold font-mono">
+              CONFIRMED
+            </span>
+            <span th:if="${b.status == 'CANCELLED'}" class="px-3 py-1 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-bold font-mono">
+              CANCELLED
+            </span>
+            <span th:if="${b.status == 'BOARDED'}" class="px-3 py-1 rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/30 text-xs font-bold font-mono">
+              BOARDED
+            </span>
+          </div>
+        </div>
+
+        <!-- Route Details -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center text-center sm:text-left">
+          
+          <!-- Origin -->
+          <div>
+            <span class="text-3xl font-black text-white tracking-wider block" th:text="${b.flight.originCode}">JFK</span>
+            <span class="text-xs text-slate-400" th:text="${b.flight.originCity} + ' • ' + ${b.flight.originTerminal}">New York • T4</span>
+            <span class="text-xs font-mono font-bold text-sky-400 block mt-1" th:text="${b.flight.departureTime}">08:30 AM</span>
+          </div>
+
+          <!-- Middle Flight Duration & Plane -->
+          <div class="flex flex-col items-center">
+            <span class="text-xs font-mono text-slate-400 font-bold mb-1" th:text="${b.flight.duration}">7h 15m non-stop</span>
+            <div class="w-full max-w-[180px] h-[2px] bg-slate-800 relative flex items-center justify-center">
+              <span class="text-sky-400 text-sm absolute">✈</span>
+            </div>
+            <span class="text-[10px] font-mono text-emerald-400 font-bold mt-1">Direct Flight</span>
+          </div>
+
+          <!-- Destination -->
+          <div class="sm:text-right">
+            <span class="text-3xl font-black text-white tracking-wider block" th:text="${b.flight.destCode}">LHR</span>
+            <span class="text-xs text-slate-400" th:text="${b.flight.destCity} + ' • ' + ${b.flight.destTerminal}">London • T5</span>
+            <span class="text-xs font-mono font-bold text-sky-400 block mt-1" th:text="${b.flight.arrivalTime}">20:45 PM</span>
+          </div>
+
+        </div>
+
+        <!-- Ticket Strip Info -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 p-4 rounded-2xl bg-slate-950 border border-slate-800 text-center text-xs">
+          <div>
+            <span class="text-[10px] uppercase text-slate-500 font-mono block">Passenger</span>
+            <span class="font-black text-white block truncate" th:text="${b.passengerName}">Malhar Sarwate</span>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase text-slate-500 font-mono block">Seat Assigned</span>
+            <span class="font-black text-emerald-400 font-mono text-sm block" th:text="${b.seat.seatCode}">17A</span>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase text-slate-500 font-mono block">Gate</span>
+            <span class="font-black text-sky-400 text-sm block" th:text="${b.gate}">B14</span>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase text-slate-500 font-mono block">Boarding Time</span>
+            <span class="font-black text-white block" th:text="${b.boardingTime}">07:50 AM</span>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase text-slate-500 font-mono block">Total Fare</span>
+            <span class="font-black text-white font-mono text-sm block" th:text="${b.totalPrice != null ? '$' + #numbers.formatDecimal(b.totalPrice, 1, 2) : '$522.50'}">$522.50</span>
+          </div>
+        </div>
+
+        <!-- Card Actions -->
+        <div class="flex items-center justify-between pt-1">
+          <div class="text-xs text-slate-500 font-mono">
+            Booked on <span th:text="${b.createdAt != null ? #temporals.format(b.createdAt, 'MMM dd, yyyy HH:mm') : 'Recent'}">Nov 20, 2026</span>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold border border-slate-700 transition flex items-center gap-1.5">
+              <span>🖨 Print Ticket</span>
+            </button>
+
+            <button th:if="${b.status == 'CONFIRMED'}" th:onclick="'cancelBooking(' + ${b.id} + ')'" class="px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold border border-rose-500/30 transition">
+              Cancel Booking ✕
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    async function cancelBooking(id) {
+      if (!confirm('Are you sure you want to cancel this flight reservation? Your seat will be released.')) {
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/bookings/' + id, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          alert('Flight reservation AL-' + id + ' cancelled successfully.');
+          window.location.reload();
+        } else {
+          alert('Failed to cancel: ' + (data.message || 'Unknown error'));
+        }
+      } catch (e) {
+        alert('Network error while cancelling booking.');
+      }
+    }
+  </script>
+
+</body>
+</html>
+
